@@ -9,11 +9,11 @@
   debug:
     msg: "Usuário já existe no AD"
   when: user_create.skipped == true
-  notify: endPlay
+  # notify: endPlay
 
-- name: Stop on not valid
-  meta: end_play
-  when: result.stdout != 'valid'
+# - name: Stop on not valid
+#   meta: end_play
+#   when: result.stdout != 'valid'
 
 # - name: Ending the 1st play now
 #   meta: end_play
@@ -42,19 +42,19 @@
   register: user_create
   when: user_exists.state == "absent"
 
-- name: Usuário já existente
-  debug:
-    msg: "Usuário já existe no AD"
-  when: user_create.skipped == true
+# - name: Usuário já existente
+#   debug:
+#     msg: "Usuário já existe no AD"
+#   when: user_create.skipped == true
 
-- name: Dados do usuário criado
+- name: Usuario criado com sucesso
   debug:
-    msg: "Usuário já existe no AD"
-  when: user_create.skipped == true
+    msg: "Usuário criado com sucesso!"
+  when: user_create.state == 'present'
 
-  handlers:
-    - name: endPlay
-      meta: end_play
+  # handlers:
+  #   - name: endPlay
+  #     meta: end_play
 
 # - debug:
 #     msg:

@@ -1,0 +1,10 @@
+---
+  - name: Delete user
+    win_domain_user:
+      name: "{{ user_login }}"
+      state: absent
+    register: user_deletion
+
+  - debug:
+      msg: "Usuario deletado com sucesso!"
+    when: user_deletion.state == "absent"

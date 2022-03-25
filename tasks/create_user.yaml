@@ -1,0 +1,64 @@
+---
+- name: Check if user is absent
+  win_domain_user:
+    name: "{{ user_login }}"
+    state: query
+  register: user_exists
+
+- name: Usuário já existente
+  debug:
+    msg: "Usuário já existe no AD"
+  when: user_create.skipped == true
+  notify: endPlay
+
+- name: Stop on not valid
+  meta: end_play
+  when: result.stdout != 'valid'
+
+# - name: Ending the 1st play now
+#   meta: end_play
+#   when: user_exists.state == "present"
+#   debug:
+#     msg: "Usuário já existe no AD"
+
+- name: Generate complex password
+  set_fact:
+    genpass_user: "{{ lookup('password', '/dev/null length=15 chars=ascii_lowercase,ascii_uppercase,digits,punctuation') }}"
+  when: user_exists.state == "absent"
+
+- name: Create user
+  win_domain_user:
+    name: "{{ user_login }}"
+    firstname: "{{ user_firstname }}"
+    surname: "{{ user_lastname }}"
+    password: "{{ genpass_user }}"
+    password_never_expires: no
+    update_password: on_create
+    user_cannot_change_password: no
+    enabled: yes
+    account_locked: no
+    path: "{{ user_ou }}"
+    state: present
+  register: user_create
+  when: user_exists.state == "absent"
+
+- name: Usuário já existente
+  debug:
+    msg: "Usuário já existe no AD"
+  when: user_create.skipped == true
+
+- name: Dados do usuário criado
+  debug:
+    msg: "Usuário já existe no AD"
+  when: user_create.skipped == true
+
+  handlers:
+    - name: endPlay
+      meta: end_play
+
+# - debug:
+#     msg:
+#     - "Usuario criado com sucesso"
+#     - "Login: '{{ user_login }}'"
+#     - "Password: '{{ genpass_user }}'"
+#   when: user_create.state == "present"

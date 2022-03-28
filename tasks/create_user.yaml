@@ -4,57 +4,40 @@
     name: "{{ user_login }}"
     state: query
   register: user_exists
+  
+- block:  
+  - name: fail
+    fail:
+      msg: "Usúario já existe no AD!"
+  when: user_exists.state = "present"
 
-- name: debug
-  debug:
-    msg: "{{ user_exists }}"
+- block:
+  - name: Generate complex password
+    set_fact:
+      genpass_user: "{{ lookup('password', '/dev/null length=15 chars=ascii_lowercase,ascii_uppercase,digits,punctuation') }}"
+    when: user_exists.state == "absent"
 
-# - name: Usuário já existente
-#   debug:
-#     msg: "Usuário já existe no AD"
-#   when: user_exists == true
-#   # notify: endPlay
+  - name: Create user
+    win_domain_user:
+      name: "{{ user_login }}"
+      firstname: "{{ user_firstname }}"
+      surname: "{{ user_lastname }}"
+      password: "{{ genpass_user }}"
+      password_never_expires: no
+      update_password: on_create
+      user_cannot_change_password: no
+      enabled: yes
+      account_locked: no
+      # path: "{{ user_ou }}"
+      state: present
+    register: user_create
 
-# - name: Stop on not valid
-#   meta: end_play
-#   when: result.stdout != 'valid'
-
-# - name: Ending the 1st play now
-#   meta: end_play
-#   when: user_exists.state == "present"
-#   debug:
-#     msg: "Usuário já existe no AD"
-
-- name: Generate complex password
-  set_fact:
-    genpass_user: "{{ lookup('password', '/dev/null length=15 chars=ascii_lowercase,ascii_uppercase,digits,punctuation') }}"
+  - name: Usuario criado com sucesso
+    debug:
+      msg: "Usuário criado com sucesso!"
+    when: user_create.state == 'present'
+  
   when: user_exists.state == "absent"
-
-- name: Create user
-  win_domain_user:
-    name: "{{ user_login }}"
-    firstname: "{{ user_firstname }}"
-    surname: "{{ user_lastname }}"
-    password: "{{ genpass_user }}"
-    password_never_expires: no
-    update_password: on_create
-    user_cannot_change_password: no
-    enabled: yes
-    account_locked: no
-    # path: "{{ user_ou }}"
-    state: present
-  register: user_create
-  when: user_exists.state == "absent"
-
-# - name: Usuário já existente
-#   debug:
-#     msg: "Usuário já existe no AD"
-#   when: user_create.skipped == true
-
-- name: Usuario criado com sucesso
-  debug:
-    msg: "Usuário criado com sucesso!"
-  when: user_create.state == 'present'
 
   # handlers:
   #   - name: endPlay

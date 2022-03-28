@@ -15,22 +15,40 @@
   - name: Generate complex password
     set_fact:
       genpass_user: "{{ lookup('password', '/dev/null length=15 chars=ascii_lowercase,ascii_uppercase,digits,punctuation') }}"
-    when: user_exists.state == "absent"
+  - block:
+    - name: Create user
+      win_domain_user:
+        name: "{{ user_login }}"
+        firstname: "{{ user_firstname }}"
+        surname: "{{ user_lastname }}"
+        password: "{{ genpass_user }}"
+        password_never_expires: no
+        update_password: on_create
+        user_cannot_change_password: no
+        password_expired: yes
+        enabled: yes
+        account_locked: no
+        # path: "{{ user_ou }}"
+        state: present
+      register: user_create
+    when: action == "createUser"
 
-  - name: Create user
-    win_domain_user:
-      name: "{{ user_login }}"
-      firstname: "{{ user_firstname }}"
-      surname: "{{ user_lastname }}"
-      password: "{{ genpass_user }}"
-      password_never_expires: no
-      update_password: on_create
-      user_cannot_change_password: no
-      enabled: yes
-      account_locked: no
-      # path: "{{ user_ou }}"
-      state: present
-    register: user_create
+  - block:
+    - name: Create user
+      win_domain_user:
+        name: "{{ user_login }}"
+        password: "{{ genpass_user }}"
+        description: "{{ description }}"
+        password_never_expires: yes
+        update_password: on_create
+        user_cannot_change_password: yes
+        password_expired: no
+        enabled: yes
+        account_locked: no
+        # path: "{{ user_ou }}"
+        state: present
+      register: user_create
+    when: action == "createSVCUser"
 
   - name: Usuario criado com sucesso
     debug:
@@ -38,14 +56,3 @@
     when: user_create.state == 'present'
   
   when: user_exists.state == "absent"
-
-  # handlers:
-  #   - name: endPlay
-  #     meta: end_play
-
-# - debug:
-#     msg:
-#     - "Usuario criado com sucesso"
-#     - "Login: '{{ user_login }}'"
-#     - "Password: '{{ genpass_user }}'"
-#   when: user_create.state == "present"

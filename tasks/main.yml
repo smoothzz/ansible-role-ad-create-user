@@ -1,7 +1,7 @@
 ---
 - name: include create task
   include_tasks: create_user.yaml
-  when: action == "createUser"
+  when: (action == "createUser") or (action == "createSVCUser")
 
 - name: include delete task
   include_tasks: elete_user.yaml

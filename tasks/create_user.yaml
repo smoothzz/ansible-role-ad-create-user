@@ -15,6 +15,7 @@
   - name: Generate complex password
     set_fact:
       genpass_user: "{{ lookup('password', '/dev/null length=15 chars=ascii_lowercase,ascii_uppercase,digits,punctuation') }}"
+  
   - block:
     - name: Create user
       win_domain_user:
@@ -31,6 +32,15 @@
         # path: "{{ user_ou }}"
         state: present
       register: user_create
+
+    - name: Usuario criado com sucesso
+      debug:
+        msg: 
+        - "Usuário criado com sucesso!"
+        - "{{ user_login }}"
+        - "{{ genpass_user }}"
+      when: user_create.state == 'present'
+
     when: action == "createUser"
 
   - block:
@@ -47,11 +57,16 @@
         # path: "{{ user_ou }}"
         state: present
       register: user_create
+
+    - name: Usuario criado com sucesso
+      debug:
+        msg: 
+        - "Usuário criado com sucesso!"
+        - "{{ user_login }}"
+        - "{{ genpass_user }}"
+
     when: action == "createSVCUser"
 
-  - name: Usuario criado com sucesso
-    debug:
-      msg: "Usuário criado com sucesso!"
-    when: user_create.state == 'present'
+  when: user_create.state == 'present'
   
   when: user_exists.state == "absent"

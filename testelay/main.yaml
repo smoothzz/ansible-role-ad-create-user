@@ -1,0 +1,58 @@
+---
+- name: Dynamic inventory
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Set which ad host
+      set_fact:
+        host_ip: '10.10.10.6'
+
+    - name: Add server to hosts
+      add_host:
+        hostname: '{{ host_ip }}'
+        ansible_user: Administrator
+        ansible_password: '@Tgo090393'
+        ansible_connection: winrm
+        ansible_winrm_server_cert_validation: ignore
+        groups: ad_server
+  
+- name: Create AD User or AD Service account
+  hosts: ad_server
+  gather_facts: false
+
+  # vars:
+  #   user_login: "thiago.antunes"
+  #   user_firstname: "Thiago"
+  #   user_lastname: "Antunes"
+  #   password_specs:
+  #   - digits
+  #   - ascii_lowercase
+  #   - ascii_uppercase
+  #   - punctuation
+  #   action: "createUser"
+
+  # tasks:
+  # - name: Set which option user wants to_do
+  #   set_fact:
+  #     action: "createUser"
+
+  # - name: include create task
+  #   include_tasks: tasks/create_user.yaml
+  #   when: action == "createUser"
+  
+  # - name: include delete task
+  #   include_tasks: tasks/delete_user.yaml
+  #   when: action == "deleteUser"
+  roles:
+  - name: ad-create-user
+    user_login: "thiago.antunes"
+    user_firstname: "Thiago"
+    user_lastname: "Antunes"
+    password_specs:
+    - digits
+    - ascii_lowercase
+    - ascii_uppercase
+    - punctuation
+    action: "createUser"

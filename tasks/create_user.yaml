@@ -64,9 +64,8 @@
         - "Usuário criado com sucesso!"
         - "{{ user_login }}"
         - "{{ genpass_user }}"
+      when: user_create.state == 'present'
 
     when: action == "createSVCUser"
-
-  when: user_create.state == 'present'
   
   when: user_exists.state == "absent"

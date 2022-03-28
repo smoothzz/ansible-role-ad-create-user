@@ -9,7 +9,7 @@
   - name: fail
     fail:
       msg: "Usúario já existe no AD!"
-  when: user_exists.state = "present"
+  when: user_exists.state == "present"
 
 - block:
   - name: Generate complex password

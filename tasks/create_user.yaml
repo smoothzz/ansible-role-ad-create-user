@@ -41,7 +41,7 @@
     user_cannot_change_password: no
     enabled: yes
     account_locked: no
-    path: "{{ user_ou }}"
+    # path: "{{ user_ou }}"
     state: present
   register: user_create
   when: user_exists.state == "absent"

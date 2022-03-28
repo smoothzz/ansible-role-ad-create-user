@@ -5,11 +5,15 @@
     state: query
   register: user_exists
 
-- name: Usuário já existente
+- name: debug
   debug:
-    msg: "Usuário já existe no AD"
-  when: user_create.skipped == true
-  # notify: endPlay
+    msg: "{{ user_exists }}"
+
+# - name: Usuário já existente
+#   debug:
+#     msg: "Usuário já existe no AD"
+#   when: user_exists == true
+#   # notify: endPlay
 
 # - name: Stop on not valid
 #   meta: end_play

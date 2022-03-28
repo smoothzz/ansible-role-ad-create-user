@@ -34,7 +34,7 @@
     when: action == "createUser"
 
   - block:
-    - name: Create user
+    - name: Create Service User
       win_domain_user:
         name: "{{ user_login }}"
         password: "{{ genpass_user }}"

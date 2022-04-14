@@ -1,2 +1,6 @@
 ---
-# vars file for ansible-role-ad-create-user
+password_specs:
+  - digits
+  - ascii_lowercase
+  - ascii_uppercase
+  - punctuation

@@ -1,8 +1,3 @@
 ---
-- name: include create task
-  include_tasks: create_user.yaml
-  when: (action == "createUser") or (action == "createSVCUser")
-
-- name: include delete task
-  include_tasks: elete_user.yaml
-  when: action == "deleteUser"
+- name: Include svc and user name validation
+  include_tasks: check_regex.yaml

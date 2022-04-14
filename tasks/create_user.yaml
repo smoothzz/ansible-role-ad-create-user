@@ -1,7 +1,7 @@
 ---
 - name: Check if user is absent
   win_domain_user:
-    name: "{{ user_login }}"
+    name: "{{ user }}"
     state: query
   register: user_exists
   
@@ -14,15 +14,16 @@
 - block:
   - name: Generate complex password
     set_fact:
-      genpass_user: "{{ lookup('password', '/dev/null length=15 chars=ascii_lowercase,ascii_uppercase,digits,punctuation') }}"
+      genpass: "{{ lookup('password', '/dev/null length=15 chars=ascii_lowercase,ascii_uppercase,digits,punctuation') }}"
   
   - block:
     - name: Create user
       win_domain_user:
-        name: "{{ user_login }}"
+        name: "{{ user }}"
+        upn: "{{ user }}@{{ domain }}"
         firstname: "{{ user_firstname }}"
         surname: "{{ user_lastname }}"
-        password: "{{ genpass_user }}"
+        password: "{{ genpass}}"
         update_password: on_create
         user_cannot_change_password: no
         password_expired: yes
@@ -32,12 +33,12 @@
         state: present
       register: user_create
 
-    - name: Usuario criado com sucesso
+    - name: User created successful
       debug:
         msg: 
         - "Usuário criado com sucesso!"
-        - "{{ user_login }}"
-        - "{{ genpass_user }}"
+        - "{{ user }}"
+        - "{{ genpass }}"
       when: user_create.state == 'present'
 
     when: action == "createUser"
@@ -45,8 +46,9 @@
   - block:
     - name: Create Service User
       win_domain_user:
-        name: "{{ user_login }}"
-        password: "{{ genpass_user }}"
+        name: "{{ user }}"
+        upn: " {{ user }}@{{ domain }} "
+        password: "{{ genpass }}"
         description: "{{ description }}"
         password_never_expires: yes
         update_password: on_create
@@ -57,12 +59,12 @@
         state: present
       register: user_create
 
-    - name: Usuario criado com sucesso
+    - name: User created successful
       debug:
         msg: 
         - "Usuário criado com sucesso!"
-        - "{{ user_login }}"
-        - "{{ genpass_user }}"
+        - "{{ user }}"
+        - "{{ genpass }}"
       when: user_create.state == 'present'
 
     when: action == "createSVCUser"

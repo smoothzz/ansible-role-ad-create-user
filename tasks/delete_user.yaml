@@ -1,10 +1,24 @@
 ---
+- name: Check if user is present
+  win_domain_user:
+    name: "{{ user }}"
+    state: query
+  register: user_exists
+
+- block:  
+  - name: fail
+    fail:
+      msg: "Usúario não existe no AD!"
+  when: user_exists.state == "absent"
+
+- block:
   - name: Delete user
     win_domain_user:
-      name: "{{ user_login }}"
+      name: "{{ user }}"
       state: absent
     register: user_deletion
 
   - debug:
-      msg: "Usuario deletado com sucesso!"
+      msg: "Usúario deletado com sucesso!"
     when: user_deletion.state == "absent"
+  when: user_exists.state == "present"

@@ -1,3 +1,0 @@
-- src: git+git@github.com:smoothzz/ansible-role-ad-create-user.git
-  version: master
-  name: ad-create-user

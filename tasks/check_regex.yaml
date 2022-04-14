@@ -1,0 +1,22 @@
+---
+- block:
+  - block:
+    - name: Validate service account name
+      fail:
+        msg: "Nome da service account não é valido"
+      when: user is not regex('^(svc\-[a-z]{1,7}\-[a-z]{3,5}\-[d-h-i-n-p-s][1-9])$')
+  - block:
+    - name: include create task
+      include_tasks: create_user.yaml
+  when: action == "createSVCUser"
+
+- block:
+  - block:
+    - name: Validate user account name
+      fail:
+        msg: "Login de usuário não é valido"
+      when: user is not regex('^([a-z]{1,15}[.][a-z]{1,15})$')
+  - block: 
+    - name: include delete task
+      include_tasks: create_user.yaml
+  when: action == "createUser"
